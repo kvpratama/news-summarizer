@@ -5,22 +5,29 @@ import pdb
 
 
 def main():
-    url = "https://edition.cnn.com/2023/11/28/middleeast/thomas-hand-emily-hostage-intl"
+    # url = "https://edition.cnn.com/2023/11/28/middleeast/thomas-hand-emily-hostage-intl"
+    topic = "covid"
 
-    payload, summary = "", ""
-    for i, text in enumerate(scraping(url)):
-        print(i, text)
-        payload += text
-        if i % 5 == 4:
+    for title, source, article_url in find_news(topic):
+        print(title, ' | ', source)
+        payload, summary = "", ""
+        for i, text in enumerate(scraping(article_url)):
+            print(i, text)
+            payload += text
+            if i % 5 == 4:
+                query = {"inputs": payload}
+                summary += inference(query)[0]['summary_text'] + "\n"
+                payload = ""
+            if i == 9:
+                break
+
+        if payload:
             query = {"inputs": payload}
-            summary += inference(query)[0]['summary_text'] + "\n"
-            payload = ""
+            summary += inference(query)[0]['summary_text']
 
-    if payload:
-        query = {"inputs": payload}
-        summary += inference(query)[0]['summary_text']
+        print(summary)
 
-    print(summary)
+        print("\n", "#" * 50)
 
 
 def inference(payload):
@@ -61,6 +68,33 @@ def scraping(url):
     news_info = soup.findAll("p")
     for news in news_info:
         yield news.text
+
+
+def find_news(about):
+    config = configparser.ConfigParser()
+    config.read('config.ini')
+    api_key = config.get('NEWSAPI', 'key')
+
+    url = "https://newsapi.org/v2/everything"
+    payload = {'q': about,
+               'sortBy': 'popularity',
+               'searchIn': 'title',
+               'apiKey': api_key,
+               'language': 'en',
+               'pageSize': '5'
+               }
+
+    web_data = requests.get(
+        url,
+        params=payload,
+        timeout=100,
+    )
+
+    if web_data.json()['status'] == 'ok':
+        for article in web_data.json()['articles']:
+            yield (article['title'], article['source']['name'], article['url'])
+    else:
+        raise ValueError(web_data.json()['message'])
 
 
 if __name__ == '__main__':
