@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
 import requests
 import configparser
+import re
 import pdb
 
 
@@ -9,17 +10,21 @@ def main():
     topic = "covid"
 
     for title, source, article_url in find_news(topic):
-        print(title, ' | ', source)
+        print('\n', title, ' | ', source)
         payload, summary = "", ""
+        paragraph_counter, max_n_paragraph, sum_every_n = 0, 9, 5
         for i, text in enumerate(scraping(article_url)):
-            print(i, text)
-            payload += text
-            if i % 5 == 4:
-                query = {"inputs": payload}
-                summary += inference(query)[0]['summary_text'] + "\n"
-                payload = ""
-            if i == 9:
-                break
+            if is_paragraph(text):
+                paragraph_counter += 1
+                print(i, paragraph_counter)
+                payload += text
+                if i % sum_every_n == sum_every_n-1:
+                    print(payload)
+                    query = {"inputs": payload}
+                    summary += inference(query)[0]['summary_text'] + "\n"
+                    payload = ""
+                if paragraph_counter == max_n_paragraph:
+                    break
 
         if payload:
             query = {"inputs": payload}
@@ -95,6 +100,25 @@ def find_news(about):
             yield (article['title'], article['source']['name'], article['url'])
     else:
         raise ValueError(web_data.json()['message'])
+
+
+def is_paragraph(text):
+    """
+    Check if the given text is a paragraph.
+
+    :param text: The text to check.
+    :type text: str
+    :return: True if the text is a paragraph, False otherwise.
+    :rtype: bool
+    """
+
+    if len(text.split()) > 15:
+        return True
+    else:
+        matches = re.findall(r"[\.?!](?:[ \w]|$)", text)
+        if len(matches) > 3:
+            return True
+    return False
 
 
 if __name__ == '__main__':
