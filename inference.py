@@ -1,7 +1,7 @@
 import requests
 
 API_URL = "https://api-inference.huggingface.co/models/facebook/bart-large-cnn"
-headers = {"Authorization": "Bearer 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"}
+headers = {"Authorization": "Bearer "}
 
 
 def query(payload):
