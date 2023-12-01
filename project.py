@@ -2,12 +2,24 @@ from bs4 import BeautifulSoup
 import requests
 import configparser
 import re
-import pdb
+# import pdb
 
 
 def main():
-    # url = "https://edition.cnn.com/2023/11/28/middleeast/thomas-hand-emily-hostage-intl"
-    topic = "covid"
+    """
+    Generates summaries for news articles related to the given topic.
+
+    Parameters:
+    - topic (str): The topic for which news articles should be retrieved and summarized.
+
+    Prints:
+    - Summaries for each news article, including the article title, source, and summary text.
+
+    Note:
+    This function uses the `find_news` function to discover news articles related to the given topic. For each article, it uses the `scraping` function to extract paragraphs and then sends the paragraphs to the `inference` function for summary generation.Summaries are printed for each article.
+    """
+
+    topic = input("Enter topic: ")
 
     for title, source, article_url in find_news(topic):
         print('\n', title, ' | ', source)
@@ -16,10 +28,10 @@ def main():
         for i, text in enumerate(scraping(article_url)):
             if is_paragraph(text):
                 paragraph_counter += 1
-                print(i, paragraph_counter)
+                # print(i, paragraph_counter)
                 payload += text
                 if i % sum_every_n == sum_every_n-1:
-                    print(payload)
+                    # print(payload)
                     query = {"inputs": payload}
                     summary += inference(query)[0]['summary_text'] + "\n"
                     payload = ""
@@ -76,6 +88,18 @@ def scraping(url):
 
 
 def find_news(about):
+    """
+    Finds news articles related to a specific topic.
+
+    Parameters:
+        about (str): The topic to search for in the news articles.
+
+    Returns:
+        generator: A generator that yields tuples containing the article title, source name, and URL.
+
+    Raises:
+        ValueError: If the API response indicates an error.
+    """
     config = configparser.ConfigParser()
     config.read('config.ini')
     api_key = config.get('NEWSAPI', 'key')
