@@ -1,5 +1,5 @@
 # News Summarizer
-#### Video Demo: 
+#### Video Demo: https://youtu.be/-mo-vtymL4Y
 
 #### Description:
 
