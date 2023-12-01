@@ -9,12 +9,12 @@
 <div class="row justify-content-center">
     <div class="col-md-6">
         <div class="content">
-            <h1 class="text-center mb-4">News Finder</h1>
-            <form action="/find" method="post" enctype="multipart/form-data" onsubmit="showLoading()">
-                <label for="image" class="form-label">Enter a news topic :</label>
-                <input type="text" name="topic" id="topic"
-                class="form-control" placeholder="Enter a news topic: e.g. COVID" required>
-                <button type="submit" class="btn btn-primary mt-3" style="margin-bottom: 5px;">Find News</button>
+            <h1 class="text-center mb-4">News Summarizer</h1>
+            <form action="/summary" method="post" enctype="multipart/form-data" onsubmit="showLoading()">
+                <label for="image" class="form-label">Enter a URL :</label>
+                <input type="url" name="url" id="url"
+                class="form-control" placeholder="Enter a url: e.g. bbc.com/news" required>
+                <button type="submit" class="btn btn-primary mt-3" style="margin-bottom: 5px;">Summarize News</button>
             </form>
             <!-- Loading spinner -->
             <div class="spinner-border text-primary" role="status" style="display:none;" id="loadingSpinner">
